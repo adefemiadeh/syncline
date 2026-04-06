@@ -15,9 +15,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useBackHandler } from "../../hooks/useBackHandler";
 import { useUserStore } from "../../store/userStore";
 
 export default function ProfileScreen() {
+  useBackHandler(true);
   const router = useRouter();
   const { user, updateUser, logout } = useUserStore();
 
