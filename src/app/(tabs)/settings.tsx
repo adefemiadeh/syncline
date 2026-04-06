@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect } from "react";
 import {
   Alert,
+  BackHandler,
   ScrollView,
   StyleSheet,
   Switch,
@@ -12,7 +14,28 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSettingsStore } from "../../store/settingsStore";
 
+// Define the types
+interface ToggleItem {
+  id: string;
+  title: string;
+  icon: string;
+  color: string;
+  value: boolean;
+  onToggle: () => void;
+  enabled: boolean;
+}
+
+interface LinkItem {
+  id: string;
+  title: string;
+  icon: string;
+  color: string;
+  onPress: () => void;
+  enabled: boolean;
+}
+
 export default function SettingsScreen() {
+  const router = useRouter();
   const {
     pushNotifications,
     darkMode,
@@ -22,111 +45,190 @@ export default function SettingsScreen() {
     toggleEmail,
   } = useSettingsStore();
 
-  const settingsSections = [
-    {
-      title: "Preferences",
-      items: [
-        {
-          id: "push",
-          title: "Push Notifications",
-          icon: "notifications-outline",
-          color: "#007AFF",
-          type: "toggle" as const,
-          value: pushNotifications,
-          onToggle: togglePush,
-        },
-        // {
-        //   id: "dark",
-        //   title: "Dark Mode",
-        //   icon: "moon-outline",
-        //   color: "#5856D6",
-        //   type: "toggle" as const,
-        //   value: darkMode,
-        //   onToggle: toggleDarkMode,
-        // },
-        // {
-        //   id: "email",
-        //   title: "Email Notifications",
-        //   icon: "mail-outline",
-        //   color: "#34C759",
-        //   type: "toggle" as const,
-        //   value: emailNotifications,
-        //   onToggle: toggleEmail,
-        // },
-      ],
-    },
+  // Handle back button on modal screens - go to profile instead of closing app
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        router.replace("/(tabs)/profile");
+        return true;
+      },
+    );
+
+    return () => backHandler.remove();
+  }, [router]);
+
+  const toggleItems: ToggleItem[] = [
     // {
-    //   title: "App Settings",
-    //   items: [
-    //     {
-    //       id: "language",
-    //       title: "Language",
-    //       icon: "language-outline",
-    //       color: "#FF9500",
-    //       type: "link" as const,
-    //       onPress: () => Alert.alert("Coming soon"),
-    //     },
-    //     {
-    //       id: "data",
-    //       title: "Data Usage",
-    //       icon: "cellular-outline",
-    //       color: "#FF3B30",
-    //       type: "link" as const,
-    //       onPress: () => Alert.alert("Coming soon"),
-    //     },
-    //     {
-    //       id: "storage",
-    //       title: "Storage",
-    //       icon: "hardware-chip-outline",
-    //       color: "#AF52DE",
-    //       type: "link" as const,
-    //       onPress: () => Alert.alert("Coming soon"),
-    //     },
-    //   ],
+    //   id: "push",
+    //   title: "Push Notifications",
+    //   icon: "notifications-outline",
+    //   color: "#007AFF",
+    //   value: pushNotifications,
+    //   onToggle: togglePush,
+    //   enabled: true,
+    // },
+    // {
+    //   id: "dark",
+    //   title: "Dark Mode",
+    //   icon: "moon-outline",
+    //   color: "#5856D6",
+    //   value: darkMode,
+    //   onToggle: toggleDarkMode,
+    //   enabled: false,
+    // },
+    // {
+    //   id: "email",
+    //   title: "Email Notifications",
+    //   icon: "mail-outline",
+    //   color: "#34C759",
+    //   value: emailNotifications,
+    //   onToggle: toggleEmail,
+    //   enabled: true,
+    // },
+  ];
+
+  const linkItems: LinkItem[] = [
+    // {
+    //   id: "language",
+    //   title: "Language",
+    //   icon: "language-outline",
+    //   color: "#FF9500",
+    //   onPress: () => Alert.alert("Coming soon"),
+    //   enabled: false,
+    // },
+    // {
+    //   id: "data",
+    //   title: "Data Usage",
+    //   icon: "cellular-outline",
+    //   color: "#FF3B30",
+    //   onPress: () => Alert.alert("Coming soon"),
+    //   enabled: true,
+    // },
+    // {
+    //   id: "storage",
+    //   title: "Storage",
+    //   icon: "hardware-chip-outline",
+    //   color: "#AF52DE",
+    //   onPress: () => Alert.alert("Coming soon"),
+    //   enabled: false,
     // },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Settings</Text>
-        </View>
+      {/* Header with back button */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.replace("/(tabs)/profile")}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Settings</Text>
+        <View style={{ width: 40 }} />
+      </View>
 
-        {settingsSections.map((section, idx) => (
-          <View key={idx} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            {section.items.map((item) => (
-              <View key={item.id} style={styles.settingItem}>
-                <View style={styles.settingLeft}>
-                  <View
-                    style={[
-                      styles.iconContainer,
-                      { backgroundColor: `${item.color}15` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={item.icon as any}
-                      size={22}
-                      color={item.color}
-                    />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Preferences Section */}
+        {toggleItems.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preferences</Text>
+            {toggleItems.map((item) => {
+              const isEnabled = item.enabled !== false;
+
+              return (
+                <View key={item.id} style={styles.settingItem}>
+                  <View style={styles.settingLeft}>
+                    <View
+                      style={[
+                        styles.iconContainer,
+                        { backgroundColor: `${item.color}15` },
+                        !isEnabled && styles.iconContainerDisabled,
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.icon as any}
+                        size={22}
+                        color={!isEnabled ? "#C6C6C8" : item.color}
+                      />
+                    </View>
+                    <Text
+                      style={[
+                        styles.settingTitle,
+                        !isEnabled && styles.settingTitleDisabled,
+                      ]}
+                    >
+                      {item.title}
+                      {!isEnabled && " (Coming Soon)"}
+                    </Text>
                   </View>
-                  <Text style={styles.settingTitle}>{item.title}</Text>
-                </View>
-                {item.type === "toggle" ? (
                   <Switch
                     value={item.value}
-                    onValueChange={item.onToggle}
+                    onValueChange={isEnabled ? item.onToggle : undefined}
                     trackColor={{ false: "#E5E5EA", true: "#007AFF" }}
                     thumbColor="#fff"
+                    disabled={!isEnabled}
                   />
-                ) : (
-                  <Ionicons name="chevron-forward" size={20} color="#C6C6C8" />
-                )}
-              </View>
-            ))}
+                </View>
+              );
+            })}
           </View>
-        ))}
+        )}
+
+        {/* App Settings Section */}
+        {linkItems.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>App Settings</Text>
+            {linkItems.map((item) => {
+              const isEnabled = item.enabled !== false;
+
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.settingItem}
+                  onPress={() => {
+                    if (isEnabled) {
+                      item.onPress();
+                    }
+                  }}
+                  disabled={!isEnabled}
+                  activeOpacity={isEnabled ? 0.7 : 1}
+                >
+                  <View style={styles.settingLeft}>
+                    <View
+                      style={[
+                        styles.iconContainer,
+                        { backgroundColor: `${item.color}15` },
+                        !isEnabled && styles.iconContainerDisabled,
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.icon as any}
+                        size={22}
+                        color={!isEnabled ? "#C6C6C8" : item.color}
+                      />
+                    </View>
+                    <Text
+                      style={[
+                        styles.settingTitle,
+                        !isEnabled && styles.settingTitleDisabled,
+                      ]}
+                    >
+                      {item.title}
+                      {!isEnabled && " (Coming Soon)"}
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={!isEnabled ? "#E5E5EA" : "#C6C6C8"}
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
 
         {/* Danger Zone */}
         <View style={styles.section}>
@@ -134,7 +236,21 @@ export default function SettingsScreen() {
           <TouchableOpacity
             style={styles.dangerItem}
             onPress={() =>
-              Alert.alert("Clear All Data", "This action cannot be undone.")
+              Alert.alert(
+                "Clear All Data",
+                "This action cannot be undone. Are you sure?",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Clear",
+                    style: "destructive",
+                    onPress: () => {
+                      // TODO: Implement clear data
+                      Alert.alert("Success", "All data has been cleared");
+                    },
+                  },
+                ],
+              )
             }
           >
             <View style={styles.settingLeft}>
@@ -155,8 +271,23 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  header: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12 },
-  headerTitle: { fontSize: 34, fontWeight: "bold", color: "#333" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+  },
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
+  headerTitle: {
+    fontSize: 34,
+    fontWeight: "bold",
+    color: "#333",
+  },
   section: { marginBottom: 32 },
   sectionTitle: {
     fontSize: 14,
@@ -182,7 +313,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
+  iconContainerDisabled: {
+    opacity: 0.5,
+  },
   settingTitle: { fontSize: 16, color: "#333" },
+  settingTitleDisabled: {
+    color: "#C6C6C8",
+  },
   dangerItem: {
     flexDirection: "row",
     alignItems: "center",

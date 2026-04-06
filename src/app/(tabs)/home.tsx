@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MessageCard } from "../../components/inbox/MessageCard";
 import { PlatformCard } from "../../components/inbox/PlatformCard";
+import { useBackHandler } from "../../hooks/useBackHandler";
 import { useUserStore } from "../../store/userStore";
 import { InboxMessage, Platform } from "../../types";
 
@@ -117,6 +118,7 @@ const initialMessages: InboxMessage[] = [
 ];
 
 export default function HomeScreen() {
+  useBackHandler(true);
   const router = useRouter();
   const { user } = useUserStore();
 
@@ -182,16 +184,16 @@ export default function HomeScreen() {
 
         {/* Stats Bar */}
         <View style={styles.statsBar}>
-          <View style={styles.statItem}>
+          {/* <View style={styles.statItem}>
             <Text style={styles.statNumber}>{unreadCount}</Text>
             <Text style={styles.statLabel}>Unread</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{messages.length}</Text>
-            <Text style={styles.statLabel}>Total</Text>
-          </View>
-          <View style={styles.statDivider} />
+          </View> */}
+          {/* <View style={styles.statDivider} /> */}
+          {/* <View style={styles.statItem}> */}
+          {/* <Text style={styles.statNumber}>{messages.length}</Text> */}
+          {/* <Text style={styles.statLabel}>Total</Text> */}
+          {/* </View> */}
+          {/* <View style={styles.statDivider} /> */}
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>
               {platforms.filter((p) => p.isConnected).length}

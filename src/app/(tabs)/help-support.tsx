@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
+  BackHandler,
   Linking,
   Modal,
   ScrollView,
@@ -20,6 +21,18 @@ import {
 
 export default function HelpSupportScreen() {
   const router = useRouter();
+  // Handle back button on modal screens - go to profile instead of closing app
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        router.replace("/(tabs)/profile");
+        return true;
+      },
+    );
+
+    return () => backHandler.remove();
+  }, [router]);
   const insets = useSafeAreaInsets();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -114,7 +127,7 @@ export default function HelpSupportScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => router.replace("/(tabs)/profile")}
             style={styles.backButton}
           >
             <Ionicons name="arrow-back" size={24} color="#333" />

@@ -191,19 +191,19 @@ export default function ProfileScreen() {
               title: "Connected Platforms",
               icon: "share-outline",
               color: "#5856D6",
-              onPress: () => router.push("/(tabs)/connected-platforms"), // Update this line
+              onPress: () => router.replace("/(tabs)/connected-platforms"), // Update this line
             },
             {
               title: "Help & Support",
               icon: "help-circle-outline",
               color: "#FF3B30",
-              onPress: () => router.push("/(tabs)/help-support"), // Update this line
+              onPress: () => router.replace("/(tabs)/help-support"), // Update this line
             },
             {
               title: "Settings",
               icon: "settings-outline",
               color: "#5856D6",
-              onPress: () => router.push("/(tabs)/settings"), // Update this line
+              onPress: () => router.replace("/(tabs)/settings"), // Update this line
             },
             {
               title: "About Syncline",

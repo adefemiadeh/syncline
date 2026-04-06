@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   Modal,
   ScrollView,
   StyleSheet,
@@ -28,6 +29,17 @@ interface Platform {
 
 export default function ConnectedPlatformsScreen() {
   const router = useRouter();
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        router.replace("/(tabs)/profile");
+        return true;
+      },
+    );
+
+    return () => backHandler.remove();
+  }, [router]);
   const insets = useSafeAreaInsets();
   const [platforms, setPlatforms] = useState<Platform[]>([
     {
@@ -172,7 +184,7 @@ export default function ConnectedPlatformsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => router.replace("/(tabs)/profile")}
             style={styles.backButton}
           >
             <Ionicons name="arrow-back" size={24} color="#333" />
